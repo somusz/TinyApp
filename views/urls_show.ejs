@@ -10,12 +10,9 @@
     <% include partials/_header %>
   <main>
     <div>
-      <ul>
-        <% for (item in urls) { %>
-          <li><%= item %> --> <%= urls[item] %></li>
-        <% }; %>
-      </ul>
-      <a href="">Look, another short URL!</a>
+      <p>
+        <%= shortURL %> redirects to <%= longURL %>
+      </p>
     </div>
 
   </main>
