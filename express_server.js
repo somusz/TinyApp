@@ -23,11 +23,7 @@ app.get('/urls/new', (req, res) => {
 app.post('/urls', (req, res) => {
   let newKey = generateRandomString();
   let newValue = req.body.longURL;
-  // console.log(newKey);
-  // console.log(req.body);
-  // console.log(newValue);
   urlDatabase[newKey] = newValue;
-  // console.log(urlDatabase);
   res.redirect(`urls/${newKey}`);
 });
 
@@ -41,6 +37,12 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+app.get('/u/:shortURL', (req, res) => {
+  let urlVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  res.redirect(urlVars.longURL);
+})
+
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
@@ -53,7 +55,6 @@ app.listen(PORT, () => {
 
 
 
-// console.log(urlDatabase);
 
 
 app.get('/urls.json', (req, res) => {
