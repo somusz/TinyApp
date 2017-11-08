@@ -10,9 +10,14 @@
     <% include partials/_header %>
   <main>
     <div>
-      <p>
-        <%= shortURL %> redirects to <%= longURL %>
+      <h1>ShortURL: <strong><%= shortURL %></strong></h1>
+      <p>Currently redirects to:
+        <a target="blank" href='<%= longURL %>'><%= longURL %></a>
       </p>
+      <form method='POST' action='/urls/<%= shortURL %>/update'>
+        <input type="text" name="update">
+        <button type='text'>Update</button>
+      </form>
     </div>
 
   </main>

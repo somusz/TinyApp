@@ -12,7 +12,12 @@
     <div>
       <ul>
         <% for (item in urls) { %>
-          <li><%= item %> --> <%= urls[item] %></li>
+          <li><%= item %> -> <a href='<%= urls[item] %>' target='blank'><%= urls[item] %></a>
+          <form method='POST' action='/urls/<%= item %>/delete'>
+            <a href='/urls/<%= item %>'>Edit</a>
+            <button type="text">Delete</button>
+          </form>
+          </li>
         <% }; %>
       </ul>
       <a href="">Look, another short URL!</a>
