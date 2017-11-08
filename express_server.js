@@ -13,16 +13,74 @@ const generateRandomString = function () {
   return Math.random().toString(36).slice(2,8);
 }
 
-var urlDatabase = {
+const generateRandomUserID = function () {
+  return (
+    Math.random().toString(36).replace(/\d/g,"").slice(2,6)+
+    Math.floor(Math.random() * (9999-1000) + 1000)
+    );
+}
+
+const users = {
+  "kamy9725": {
+    id: "kamy9725",
+    email: "kamy9725@example.com",
+    password: "kamy9725pass"
+  },
+ "tkss9726": {
+    id: "tkss9726",
+    email: "tkss9726@example.com",
+    password: "tkss9726pass"
+  }
+}
+
+const urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.com'
 };
 
-app.get('/urls/new', (req, res) => {
-  let templateVars = {
-    username: req.cookies['username']
+app.post('/login', (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect('/urls');
+})
+
+app.post('/logout', (req, res) => {
+  res.clearCookie('username');
+  res.redirect('/urls');
+})
+
+app.get('/register', (req, res) => {
+  res.render('register');
+})
+
+app.post('/register', (req, res) => {
+  let found = false;
+  Object.keys(users).forEach(function(user) {
+    if (users[user].email == req.body.email) {
+      found = true;
+    }
+  })
+  if (found == true) {
+      res.status(400).send('This email address is already registered.');
+  } else if (req.body.email && req.body.password) {
+    let newUser = {
+      id: generateRandomUserID(),
+      email: req.body.email,
+      password: req.body.password
+    }
+    users[newUser.id] = newUser;
+    res.cookie('user_id', newUser.id);
+    res.redirect('/urls');
+  } else {
+    res.status(400).send('Please register with an email address and a password.');
   }
-  res.render('urls_new', templateVars);
+})
+
+app.get('/urls', (req, res) => {
+  let templateVars = {
+    username: req.cookies['username'],
+    urls: urlDatabase
+  };
+  res.render('urls_index', templateVars);
 });
 
 app.post('/urls', (req, res) => {
@@ -32,13 +90,12 @@ app.post('/urls', (req, res) => {
   res.redirect(`urls/${newKey}`);
 });
 
-app.get('/urls', (req, res) => {
+app.get('/urls/new', (req, res) => {
   let templateVars = {
-    username: req.cookies['username'],
-    urls: urlDatabase
-  };
-  res.render('urls_index', templateVars);
-});
+    username: req.cookies['username']
+  }
+  res.render('urls_new', templateVars);
+})
 
 app.get('/urls/:id', (req, res) => {
   let templateVars = {
@@ -65,16 +122,6 @@ app.get('/u/:shortURL', (req, res) => {
     longURL: urlDatabase[req.params.shortURL]
   };
   res.redirect(templateVars.longURL);
-})
-
-app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
-})
-
-app.post('/logout', (req, res) => {
-  res.clearCookie('username');
-  res.redirect('/urls');
 })
 
 app.listen(PORT, () => {
