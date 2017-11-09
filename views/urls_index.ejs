@@ -11,33 +11,17 @@
   <main>
     <div>
       <p>Your links</p>
-        <% for (item in urls) { %>
-          <form method='POST' action='/urls/<%= item %>/delete'>
-            <% if (user.id == urls[item].userID) { %>
-              <ul>
-                <li>
-                  <%= item %> -> <a href='<%= urls[item].longURL %>' target='blank'><%= urls[item].longURL %></a>
-                  <a href='/urls/<%= item %>'>Edit</a>
-                  <button type='text'>Delete</button>
-                </li>
-              </ul>
-            <% } %>
-          </form>
-        <% } %>
-    </div>
-    <div>
-      <p>Other links</p>
-        <% for (item in urls) { %>
-          <form method='POST' action='/urls/<%= item %>/delete'>
-            <% if (user.id != urls[item].userID) { %>
-              <ul>
-                <li>
-                  <%= item %> -> <a href='<%= urls[item].longURL %>' target='blank'><%= urls[item].longURL %></a>
-                </li>
-              </ul>
-            <% } %>
-          </form>
-        <% } %>
+      <% for (item in urls) { %>
+        <form method='POST' action='/urls/<%= item %>/delete'>
+          <ul>
+            <li>
+              <%= item %> is: <a href='<%= urls[item]['longURL'] %>'><%= urls[item]['longURL'] %></a>
+              <a href='/urls/<%= item %>'>Edit</a>
+              <button type='text'>Delete</button>
+            </li>
+          </ul>
+        </form>
+      <% } %>
     </div>
     <div>
         <p><a href='/urls/new'>Create another short URL!</a></p>

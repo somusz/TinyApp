@@ -6,13 +6,17 @@
 </head>
 
 <body>
-  <div>
-    <form method='POST' action='/login'>
-      <input type='email' name='email'>
-      <input type='password' name='password'>
-      <button>Login</button>
-    </form>
-  </div>
+  <% if (user) { %>
+    <% include partials/_header %>
+  <% } else {%>
+    <div>
+      <form method='POST' action='/login'>
+        <input type='email' name='email'>
+        <input type='password' name='password'>
+        <button>Login</button>
+      </form>
+    </div>
+  <% } %>
 </body>
 </html>
 

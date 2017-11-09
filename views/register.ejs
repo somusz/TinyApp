@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
   <meta charset='utf-8'>
   <title>TinyApp Register</title>
-
 </head>
 
 <body>
-  <div>
-    <form method='POST' action='/register'>
-      <input type='email' name='email'>
-      <input type='password' name='password'>
-      <button>Register</button>
-    </form>
-  </div>
-
-
+  <% if (user) { %>
+    <% include partials/_header %>
+  <% } else {%>
+    <div>
+      <form method='POST' action='/register'>
+        <input type='email' name='email'>
+        <input type='password' name='password'>
+        <button>Register</button>
+      </form>
+    </div>
+  <% } %>
 </body>
 </html>

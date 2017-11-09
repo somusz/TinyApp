@@ -30,12 +30,21 @@ const checkUser = function (req, res, next) {
     req.currentUser = currentUser;
     next();
   } else {
-    res.redirect('/login');
+    res.redirect('/login/prompt');
   }
 }
 
 app.use(checkUser);
 
+function urlsForUser (id) {
+  let filteredData = {};
+  for (item in urlDatabase) {
+    if (urlDatabase[item]['userID'] == id) {
+      filteredData[item] = urlDatabase[item];
+    }
+  }
+  return filteredData;
+}
 
 const users = {
   "kamy9725": {
@@ -68,11 +77,21 @@ const urlDatabase = {
 
 
 app.get('/', (req, res) => {
-  res.send('Hello!');
+    res.send('Hello!');
 });
 
 app.get('/login', (req, res) => {
-  res.render('login');
+  let templateVars = {
+    user: users[req.cookies['user_id']],
+  }
+  res.render('login', templateVars);
+})
+
+app.get('/login/prompt', (req, res) => {
+  let templateVars = {
+    user: users[req.cookies['user_id']],
+  }
+  res.render('login_prompt', templateVars);
 })
 
 app.post('/login', (req, res) => {
@@ -97,12 +116,15 @@ app.post('/login', (req, res) => {
 })
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  res.clearCookie('user_id','not_logged');
   res.redirect('/urls');
 })
 
 app.get('/register', (req, res) => {
-  res.render('register');
+  let templateVars = {
+    user: users[req.cookies['user_id']],
+  }
+  res.render('register', templateVars);
 })
 
 app.post('/register', (req, res) => {
@@ -131,9 +153,8 @@ app.post('/register', (req, res) => {
 app.get('/urls', (req, res) => {
   let templateVars = {
     user: users[req.cookies['user_id']],
-    urls: urlDatabase,
+    urls: urlsForUser(req.cookies['user_id']),
   };
-  console.log(templateVars);
   res.render('urls_index', templateVars);
 });
 
@@ -148,20 +169,20 @@ app.post('/urls', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-  let templateVars = {
-    user: users[req.cookies['user_id']],
-  }
-  res.render('urls_new', templateVars);
+    let templateVars = {
+      user: users[req.cookies['user_id']],
+    }
+    res.render('urls_new', templateVars);
 })
 
 app.get('/urls/:id', (req, res) => {
-  let templateVars = {
-    user: users[req.cookies['user_id']],
-    shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id]['longURL'],
-    userIDCreator: urlDatabase[req.params.id]['userID']
-  }
-  res.render('urls_show', templateVars);
+    let templateVars = {
+      user: users[req.cookies['user_id']],
+      shortURL: req.params.id,
+      longURL: urlDatabase[req.params.id]['longURL'],
+      userIDCreator: urlDatabase[req.params.id]['userID']
+    }
+    res.render('urls_show', templateVars);
 });
 
 app.post('/urls/:id/delete', (req, res) => {
