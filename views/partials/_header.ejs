@@ -1,6 +1,6 @@
 <header>
-  <% if (username) { %>
-    <label> Signed in as <strong><%= username %></strong></label>
+  <% if (user) { %>
+    <label> Signed in as <strong><%= user.id %></strong></label>
     <form method='POST' action='/logout'>
       <button>Logout</button>
     </form>
