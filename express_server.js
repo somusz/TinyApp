@@ -132,8 +132,8 @@ app.get('/urls', (req, res) => {
   let templateVars = {
     user: users[req.cookies['user_id']],
     urls: urlDatabase,
-    userIDCreator: urlDatabase[req.cookies['userID']]
   };
+  console.log(templateVars);
   res.render('urls_index', templateVars);
 });
 
