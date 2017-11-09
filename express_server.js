@@ -51,8 +51,14 @@ const users = {
 }
 
 const urlDatabase = {
-  'b2xVn2': 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.com'
+  'b2xVn2': {
+    longURL: 'http://www.lighthouselabs.ca',
+    userID: 'hardcoded'
+  },
+  '9sm5xK': {
+    longURL: 'http://www.google.com',
+    userID: 'hardcoded'
+  }
 };
 
 
@@ -125,8 +131,8 @@ app.post('/register', (req, res) => {
 app.get('/urls', (req, res) => {
   let templateVars = {
     user: users[req.cookies['user_id']],
-    // cookie: req.cookies['user_id'],
-    urls: urlDatabase
+    urls: urlDatabase,
+    userIDCreator: urlDatabase[req.cookies['userID']]
   };
   res.render('urls_index', templateVars);
 });
@@ -134,7 +140,10 @@ app.get('/urls', (req, res) => {
 app.post('/urls', (req, res) => {
   let newKey = generateRandomString();
   let newValue = req.body.longURL;
-  urlDatabase[newKey] = newValue;
+  urlDatabase[newKey] = {
+    longURL: newValue,
+    userID: req.cookies['user_id']
+  };
   res.redirect(`urls/${newKey}`);
 });
 
@@ -149,7 +158,8 @@ app.get('/urls/:id', (req, res) => {
   let templateVars = {
     user: users[req.cookies['user_id']],
     shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id]
+    longURL: urlDatabase[req.params.id]['longURL'],
+    userIDCreator: urlDatabase[req.params.id]['userID']
   }
   res.render('urls_show', templateVars);
 });
@@ -160,14 +170,15 @@ app.post('/urls/:id/delete', (req, res) => {
 })
 
 app.post('/urls/:id/update', (req, res) => {
-  urlDatabase[req.params.id] = req.body.update;
-  res.redirect('/urls');
+  urlDatabase[req.params.id]['longURL'] = req.body.update;
+  res.redirect(`/urls/${req.params.id}`);
 })
 
 app.get('/u/:shortURL', (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL]
+    longURL: urlDatabase[req.params.shortURL]['longURL'],
+    userIDCreator: urlDatabase[req.params.shortURL]['userID']
   };
   res.redirect(templateVars.longURL);
 })

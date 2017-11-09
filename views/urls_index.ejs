@@ -12,10 +12,11 @@
     <div>
       <ul>
         <% for (item in urls) { %>
-          <li><%= item %> -> <a href='<%= urls[item] %>' target='blank'><%= urls[item] %></a>
+          <li>
           <form method='POST' action='/urls/<%= item %>/delete'>
+            <%= item %> -> <a href='<%= urls[item].longURL %>' target='blank'><%= urls[item].longURL %></a>
             <a href='/urls/<%= item %>'>Edit</a>
-            <button type="text">Delete</button>
+            <button type='text'>Delete</button>
           </form>
           </li>
         <% }; %>
