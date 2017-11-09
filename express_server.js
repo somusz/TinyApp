@@ -2,7 +2,8 @@ var express = require('express');
 var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 
 
 const generateRandomString = function () {
@@ -39,7 +40,7 @@ app.use(checkUser);
 function urlsForUser (id) {
   let filteredData = {};
   for (item in urlDatabase) {
-    if (urlDatabase[item]['userID'] == id) {
+    if (urlDatabase[item]['userID'] === id) {
       filteredData[item] = urlDatabase[item];
     }
   }
@@ -50,12 +51,12 @@ const users = {
   "kamy9725": {
     id: "kamy9725",
     email: "kamy9725@example.com",
-    password: "kamy9725pass"
+    hashedPassword: "$2a$10$jyR9nPTMHU.W/PtMjzKySuaHcADmU6mWodfH0waTqQfyUTW5R7ouO"
   },
  "tkss9726": {
     id: "tkss9726",
     email: "tkss9726@example.com",
-    password: "tkss9726pass"
+    hashedPassword: "$2a$10$8PYL0DXWTrGaN03cdQ7UMembYs5HjA798VjOfyqTKmkWmweytL6vK"
   }
 }
 
@@ -98,14 +99,15 @@ app.post('/login', (req, res) => {
   let loggedUser = "";
   let emailCheck = function () {
     for (person in users) {
-      if (users[person].email == req.body.email) {
+      if (users[person].email === req.body.email) {
         loggedUser = users[person].id;
       }
     }
   }()
   if (loggedUser) {
-    if (users[loggedUser].password == req.body.password) {
+    if (bcrypt.compareSync(req.body.password, users[loggedUser].hashedPassword)) {
       res.cookie('user_id', loggedUser);
+console.log(users);
       res.redirect('/');
     } else {
       res.status(403).send('Incorrect password.');
@@ -130,7 +132,7 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
   let found = false;
   Object.keys(users).forEach(function(user) {
-    if (users[user].email == req.body.email) {
+    if (users[user].email === req.body.email) {
       found = true;
     }
   })
@@ -140,7 +142,8 @@ app.post('/register', (req, res) => {
     let newUser = {
       id: generateRandomUserID(),
       email: req.body.email,
-      password: req.body.password
+      password: req.body.password,
+      hashedPassword: bcrypt.hashSync(req.body.password, 10)
     }
     users[newUser.id] = newUser;
     res.cookie('user_id', newUser.id);
