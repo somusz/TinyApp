@@ -1,16 +1,12 @@
 <header>
   <% if (user) { %>
-    <label> Signed in as <strong><%= user.id %></strong></label>
+    <label> Logged in as <strong><%= user.id %></strong></label>
     <form method='POST' action='/logout'>
       <button>Logout</button>
     </form>
-  <% } else { %>
-    <form method='POST' action='/login'>
-      Login:
-      <input type='text' name='username'>
-      <button>Submit</button>
-    </form>
-  <% } %>
+  <% } else {%>
+    <a href='/login'>Log in</a> or <a href='/register'>register</a>
+  <% }%>
 
   <h1>title</h1>
 </header>

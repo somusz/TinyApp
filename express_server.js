@@ -38,9 +38,39 @@ const urlDatabase = {
   '9sm5xK': 'http://www.google.com'
 };
 
+
+
+
+
+
+
+app.get('/', (req, res) => {
+  res.send('Hello!');
+});
+
+app.get('/login', (req, res) => {
+  res.render('login');
+})
+
 app.post('/login', (req, res) => {
-  res.cookie('user_id', req.body.username);
-  res.redirect('/urls');
+  let loggedUser = "";
+  let emailCheck = function () {
+    for (user in users) {
+      if (users[user].email == req.body.email) {
+        loggedUser = users[user].id;
+      }
+    }
+  }()
+  if (loggedUser) {
+    if (users[loggedUser].password == req.body.password) {
+      res.cookie('user_id', loggedUser);
+      res.redirect('/');
+    } else {
+      res.status(403).send('Incorrect password.');
+    }
+  } else {
+    res.status(403).send('This email address is not registered');
+  }
 })
 
 app.post('/logout', (req, res) => {
@@ -139,10 +169,6 @@ app.listen(PORT, () => {
 
 // app.get('/urls.json', (req, res) => {
 //   res.json(urlDatabase);
-// });
-
-// app.get('/', (req, res) => {
-//   res.end('Hello!');
 // });
 
 // app.get('/hello', (req, res) => {
