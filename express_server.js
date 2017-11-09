@@ -4,10 +4,6 @@ var PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
-
-app.set('view engine', 'ejs');
 
 const generateRandomString = function () {
   return Math.random().toString(36).slice(2,8);
@@ -19,6 +15,27 @@ const generateRandomUserID = function () {
     Math.floor(Math.random() * (9999-1000) + 1000)
     );
 }
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
+app.set('view engine', 'ejs');
+
+const checkUser = function (req, res, next) {
+  if (req.path.match(/login|register/)) {
+    next();
+    return;
+  }
+  const currentUser = req.cookies['user_id'];
+  if (currentUser) {
+    req.currentUser = currentUser;
+    next();
+  } else {
+    res.redirect('/login');
+  }
+}
+
+app.use(checkUser);
+
 
 const users = {
   "kamy9725": {
@@ -55,9 +72,9 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   let loggedUser = "";
   let emailCheck = function () {
-    for (user in users) {
-      if (users[user].email == req.body.email) {
-        loggedUser = users[user].id;
+    for (person in users) {
+      if (users[person].email == req.body.email) {
+        loggedUser = users[person].id;
       }
     }
   }()
