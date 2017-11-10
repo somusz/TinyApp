@@ -1,10 +1,18 @@
+<!-- header page injected to other pages -->
+
 <header>
+  <h1>TinyApp</h1>
+  <div>
+<!-- logged users are confirmed of being logged in -->
   <% if (user) { %>
-    <label> Logged in as <strong><%= user.id %></strong></label>
-    <form method='POST' action='/logout'>
+    <form method='POST' action='/logout' style="margin:20px;">
+    <label> Your user ID is <strong><%= user.id %></strong>.</label>
       <button>Logout</button>
     </form>
+<!-- unlogged users can log in or register -->
   <% } else {%>
-    <p>Please <a href='/login'>log in</a> or <a href='/register'>register</a></p>
+    <p>Please <a href='/login'>log in</a> or <a href='/register'>register</a>.</p>
   <% }%>
+  </div>
+  <br style='font-size:30px'>
 </header>

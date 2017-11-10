@@ -1,3 +1,5 @@
+<!-- short URL edit page -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,21 +8,28 @@
   <title>TinyApp</title>
 </head>
 
-<body>
+<body style="font-size:20px; padding:20px;">
+
     <% include partials/_header %>
+
   <main>
     <div>
-      <h1>ShortURL: <strong><%= shortURL %></strong></h1>
+      <p>Your short URL: http://localhost:8080/u/<strong><%= shortURL %></strong></p>
       <p>Currently redirects to:
         <a target="blank" href='<%= longURL %>'><%= longURL %></a>
       </p>
-      <form method='POST' action='/urls/<%= shortURL %>/update'>
-        <input type="text" name="update">
+<!-- option to update an existing url -->
+      <form method='POST' action='/urls/<%= shortURL %>/update' style="margin:20px;">
+        <input type="text" name="update" placeholder='<%= longURL %>' style='width: 300px; height: 20px'>
         <button type='text'>Update</button>
       </form>
     </div>
-
   </main>
-
+<!-- options to add new url or navigate back to library -->
+  <div>
+    <br style='font-size:30px'>
+    <p><a href='/urls/new'>Add another URL</a></p>
+    <p><a href='/urls'>Back to the URL library</a></p>
+  </div>
 </body>
 </html>

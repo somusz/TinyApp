@@ -1,11 +1,14 @@
+//TinyApp Server
+
+//requiring resources
 const cookieSession = require('cookie-session');
-var express = require('express');
-var app = express();
-var PORT = process.env.PORT || 8080; // default port 8080
+const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 8080;
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 
-
+//random generator functions for IDs
 const generateRandomString = function () {
   return Math.random().toString(36).slice(2,8);
 }
@@ -14,16 +17,10 @@ const generateRandomUserID = function () {
   return (
     Math.random().toString(36).replace(/\d/g,"").slice(2,6)+
     Math.floor(Math.random() * (9999-1000) + 1000)
-    );
+  );
 }
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieSession( {
-  name: 'session',
-  keys: ['thisisthebestsecretkeyforcookies']
-  }));
-app.set('view engine', 'ejs');
-
+//function for checking if a user is already logged
 const checkUser = function (req, res, next) {
   if (req.path.match(/login|register/)) {
     next();
@@ -38,8 +35,7 @@ const checkUser = function (req, res, next) {
   }
 }
 
-app.use(checkUser);
-
+//function for filtering urls database for users
 function urlsForUser (id) {
   let filteredData = {};
   for (item in urlDatabase) {
@@ -50,6 +46,16 @@ function urlsForUser (id) {
   return filteredData;
 }
 
+//launching resources
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieSession( {
+  name: 'session',
+  keys: ['thisisthebestsecretkeyforcookies']
+  }));
+app.set('view engine', 'ejs');
+app.use(checkUser);
+
+//databases: users and urls
 const users = {
   "kamy9725": {
     id: "kamy9725",
@@ -74,16 +80,12 @@ const urlDatabase = {
   }
 };
 
-
-
-
-
-
-
+//root directory is redirected to the user's (if logged) library
 app.get('/', (req, res) => {
-    res.send('Hello!');
+  res.redirect('/urls');
 });
 
+//login page rendering - also capturing users who are already logged in
 app.get('/login', (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
@@ -91,6 +93,7 @@ app.get('/login', (req, res) => {
   res.render('login', templateVars);
 })
 
+//login prompt page rendering: unlogged users are prompted to log in or register
 app.get('/login/prompt', (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
@@ -98,6 +101,8 @@ app.get('/login/prompt', (req, res) => {
   res.render('login_prompt', templateVars);
 })
 
+//upon post request to login page, the users' email is compared against database;
+//errors if incorrect data; correct logins are logged with cookies and redirected
 app.post('/login', (req, res) => {
   let loggedUser = "";
   let emailCheck = function () {
@@ -110,7 +115,7 @@ app.post('/login', (req, res) => {
   if (loggedUser) {
     if (bcrypt.compareSync(req.body.password, users[loggedUser].hashedPassword)) {
       req.session.user_id = loggedUser;
-      res.redirect('/');
+      res.redirect('/urls');
     } else {
       res.status(403).send('Incorrect password.');
     }
@@ -119,11 +124,13 @@ app.post('/login', (req, res) => {
   }
 })
 
+//logout request clears user_id cookie and redirects to login page
 app.post('/logout', (req, res) => {
   req.session.user_id = '';
-  res.redirect('/urls');
+  res.redirect('/login');
 })
 
+//register page renders
 app.get('/register', (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
@@ -131,6 +138,9 @@ app.get('/register', (req, res) => {
   res.render('register', templateVars);
 })
 
+//upon registration request, data is checked for completeness and email is checked against database
+//upon successful registration, new user is added with generated ID and hashed password
+//and cookie applied; unsuccessful registrations send error messages
 app.post('/register', (req, res) => {
   let found = false;
   Object.keys(users).forEach(function(user) {
@@ -139,22 +149,23 @@ app.post('/register', (req, res) => {
     }
   })
   if (found == true) {
-      res.status(400).send('This email address is already registered.');
+    res.status(400).send('This email address is already registered.');
   } else if (req.body.email && req.body.password) {
     let newUser = {
       id: generateRandomUserID(),
       email: req.body.email,
-      password: req.body.password,
       hashedPassword: bcrypt.hashSync(req.body.password, 10)
     }
     users[newUser.id] = newUser;
     req.session.user_id = newUser.id;
     res.redirect('/urls');
   } else {
-    res.status(400).send('Please register with an email address and a password.');
+      res.status(400).send('Please register with an email address and a password.');
   }
 })
 
+//urls page (aka library) renders
+//url database is pre-filtered according to user's access rights
 app.get('/urls', (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
@@ -163,6 +174,9 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
+//upon post request, an ID is generated for the new URL
+//short and original URLs are written into the database
+//redirection to the new URL's edit page
 app.post('/urls', (req, res) => {
   let newKey = generateRandomString();
   let newValue = req.body.longURL;
@@ -173,33 +187,38 @@ app.post('/urls', (req, res) => {
   res.redirect(`urls/${newKey}`);
 });
 
+//rendering page for new URL entries
 app.get('/urls/new', (req, res) => {
-    let templateVars = {
-      user: users[req.session.user_id],
+  let templateVars = {
+    user: users[req.session.user_id],
     }
-    res.render('urls_new', templateVars);
+  res.render('urls_new', templateVars);
 })
 
+//rendering URL edit page upon URL-specific request
 app.get('/urls/:id', (req, res) => {
-    let templateVars = {
-      user: users[req.session.user_id],
-      shortURL: req.params.id,
-      longURL: urlDatabase[req.params.id]['longURL'],
-      userIDCreator: urlDatabase[req.params.id]['userID']
-    }
-    res.render('urls_show', templateVars);
+  let templateVars = {
+    user: users[req.session.user_id],
+    shortURL: req.params.id,
+    longURL: urlDatabase[req.params.id]['longURL'],
+    userIDCreator: urlDatabase[req.params.id]['userID']
+  }
+  res.render('urls_show', templateVars);
 });
 
+//deleting URL entry from database upon request
 app.post('/urls/:id/delete', (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
 })
 
+//updating URL entry upon request
 app.post('/urls/:id/update', (req, res) => {
   urlDatabase[req.params.id]['longURL'] = req.body.update;
   res.redirect(`/urls/${req.params.id}`);
 })
 
+//rediricting short URL to the long URL destination
 app.get('/u/:shortURL', (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
@@ -209,22 +228,9 @@ app.get('/u/:shortURL', (req, res) => {
   res.redirect(templateVars.longURL);
 })
 
+//server set to listening
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
 
-
-
-
-
-
-
-
-// app.get('/urls.json', (req, res) => {
-//   res.json(urlDatabase);
-// });
-
-// app.get('/hello', (req, res) => {
-//   res.end('<html><body>Hello <b>World</b></body></html>\n');
-// });

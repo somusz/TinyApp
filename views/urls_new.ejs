@@ -1,20 +1,28 @@
+<!-- short url generating page -->
+
 <!DOCTYPE html>
 <html lang="en">
 
-  <head></head>
+  <head>
+    <meta charset='utf-8'>
+    <title>TinyApp New URL</title>
+  </head>
 
-  <body style="font-size:20px; padding:50px;">
+  <body style="font-size:20px; padding:20px;">
 
     <% include partials/_header %>
 
-    <form action="/urls" method="POST" style="margin:150px;">
-
-      <label for="longURL">Enter a full URL:</label>
-
-      <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
+    <form action="/urls" method="POST" style="margin:20px;">
+      <label style='font-size:30px;'>Get a new short URL</label>
+      <br style='font-size:30px'>
+      <label for="longURL">Your full URL:</label>
+      <input id="longURL" type="text" name="longURL" placeholder="http://" style='width: 300px; height: 20px'>
       <input type="submit" value="Submit">
-
     </form>
-
+<!-- option to navigate back to library -->
+    <div>
+      <br style='font-size:30px'>
+      <p><a href='/urls'>Back to your library</a></p>
+    </div>
   </body>
 </html>

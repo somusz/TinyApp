@@ -1,21 +1,26 @@
+<!-- urls page (aka library) -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="utf-8">
-  <title>TinyApp</title>
+  <title>TinyApp Index</title>
 </head>
 
-<body>
+<body style="font-size:20px; padding:20px;">
+
   <% include partials/_header %>
+
   <main>
     <div>
-      <p>Your links</p>
+      <p style='font-size:30px'>Your link library:</p>
+<!-- listing entries for which the user have access with options to edit or delete -->
       <% for (item in urls) { %>
-        <form method='POST' action='/urls/<%= item %>/delete'>
+        <form method='POST' action='/urls/<%= item %>/delete' style="margin:20px;">
           <ul>
             <li>
-              <%= item %> is: <a href='<%= urls[item]['longURL'] %>'><%= urls[item]['longURL'] %></a>
+              http://localhost:8080/u/<strong><%= item %></strong> is redirected to: <a href='<%= urls[item]['longURL'] %>'><%= urls[item]['longURL'] %></a>
               <a href='/urls/<%= item %>'>Edit</a>
               <button type='text'>Delete</button>
             </li>
@@ -23,10 +28,11 @@
         </form>
       <% } %>
     </div>
+<!-- link for another entry -->
     <div>
-        <p><a href='/urls/new'>Create another short URL!</a></p>
+      <br style='font-size:30px'>
+      <p><a href='/urls/new'>Add new URL</a></p>
     </div>
   </main>
-
 </body>
 </html>

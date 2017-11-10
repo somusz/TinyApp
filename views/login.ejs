@@ -1,3 +1,5 @@
+<!-- login page -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,14 +7,19 @@
   <title>TinyApp Login</title>
 </head>
 
-<body>
+<body style="font-size:20px; padding:20px;">
+<!-- paths: logged users get confirmation of being logged in -->
   <% if (user) { %>
+
     <% include partials/_header %>
+
+<!-- unlogged users can log in -->
   <% } else {%>
     <div>
-      <form method='POST' action='/login'>
-        <input type='email' name='email'>
-        <input type='password' name='password'>
+      <form method='POST' action='/login' style="margin:20px;">
+        Email: <input type='email' name='email' placeholder='Your email address' style='width: 300px; height: 20px'>
+        <br>
+        Password: <input type='password' name='password' placeholder='Your password' style='width: 300px; height: 20px'>
         <button>Login</button>
       </form>
     </div>
