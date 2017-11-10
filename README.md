@@ -24,3 +24,6 @@ TinyApp is a full stack web application using Node and Express that allows users
 
 ## Screenshots
 
+!['Screenshot of login prompt page'](https://github.com/somusz/TinyApp/blob/master/docs/Screenshot-TinyApp%20Login%20Prompt.png?raw=true)
+!['Screenshot of URL library page'](https://github.com/somusz/TinyApp/blob/master/docs/Screenshot-TinyApp%20URL%20Library.png?raw=true)
+!['Screenshot of URL edit page'](https://github.com/somusz/TinyApp/blob/master/docs/Screenshot-TinyApp%20URL%20Edit.png?raw=true)
