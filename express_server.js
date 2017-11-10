@@ -22,7 +22,7 @@ const generateRandomUserID = function () {
 
 //function for checking if a user is already logged
 const checkUser = function (req, res, next) {
-  if (req.path.match(/login|register/)) {
+  if (req.path.match(/login|register|u\//)) {
     next();
     return;
   }
@@ -56,15 +56,18 @@ app.set('view engine', 'ejs');
 app.use(checkUser);
 
 //databases: users and urls
+//hardcoded examples for testing
 const users = {
   "kamy9725": {
     id: "kamy9725",
     email: "kamy9725@example.com",
+    password: 'kamy9725pass',
     hashedPassword: "$2a$10$jyR9nPTMHU.W/PtMjzKySuaHcADmU6mWodfH0waTqQfyUTW5R7ouO"
   },
  "tkss9726": {
     id: "tkss9726",
     email: "tkss9726@example.com",
+    password: 'tkss9726pass',
     hashedPassword: "$2a$10$8PYL0DXWTrGaN03cdQ7UMembYs5HjA798VjOfyqTKmkWmweytL6vK"
   }
 }
@@ -87,10 +90,14 @@ app.get('/', (req, res) => {
 
 //login page rendering - also capturing users who are already logged in
 app.get('/login', (req, res) => {
-  let templateVars = {
-    user: users[req.session.user_id],
-  }
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  } else {
+    let templateVars = {
+      user: users[req.session.user_id],
+    }
   res.render('login', templateVars);
+  }
 })
 
 //login prompt page rendering: unlogged users are prompted to log in or register
@@ -132,10 +139,14 @@ app.post('/logout', (req, res) => {
 
 //register page renders
 app.get('/register', (req, res) => {
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  } else {
   let templateVars = {
     user: users[req.session.user_id],
   }
   res.render('register', templateVars);
+  }
 })
 
 //upon registration request, data is checked for completeness and email is checked against database
@@ -197,13 +208,21 @@ app.get('/urls/new', (req, res) => {
 
 //rendering URL edit page upon URL-specific request
 app.get('/urls/:id', (req, res) => {
-  let templateVars = {
-    user: users[req.session.user_id],
-    shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id]['longURL'],
-    userIDCreator: urlDatabase[req.params.id]['userID']
+  if (urlDatabase[req.params.id]) {
+    let templateVars = {
+      user: users[req.session.user_id],
+      shortURL: req.params.id,
+      longURL: urlDatabase[req.params.id]['longURL'],
+      userIDCreator: urlDatabase[req.params.id]['userID']
+    }
+    if (templateVars.user.id == templateVars.userIDCreator) {
+      res.render('urls_show', templateVars);
+    } else {
+      res.redirect('/urls');
+    }
+  } else {
+    res.redirect('/urls');
   }
-  res.render('urls_show', templateVars);
 });
 
 //deleting URL entry from database upon request
@@ -220,12 +239,16 @@ app.post('/urls/:id/update', (req, res) => {
 
 //rediricting short URL to the long URL destination
 app.get('/u/:shortURL', (req, res) => {
-  let templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL]['longURL'],
-    userIDCreator: urlDatabase[req.params.shortURL]['userID']
-  };
+  if (urlDatabase[req.params.shortURL]) {
+    let templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL]['longURL'],
+      userIDCreator: urlDatabase[req.params.shortURL]['userID']
+    };
   res.redirect(templateVars.longURL);
+  } else {
+    res.send('This TinyApp URL is not registered.');
+  }
 })
 
 //server set to listening
