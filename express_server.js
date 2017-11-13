@@ -159,7 +159,7 @@ app.post('/register', (req, res) => {
       found = true;
     }
   })
-  if (found == true) {
+  if (found === true) {
     res.status(400).send('This email address is already registered.');
   } else if (req.body.email && req.body.password) {
     let newUser = {
